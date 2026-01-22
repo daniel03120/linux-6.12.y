@@ -18,7 +18,6 @@
 	compatible = "rockchip,rk3568-evb1-v10", "rockchip,rk3568";
 
 	aliases {
-		// 修正别名映射：eth0对应gmac1(RGMII)，eth1对应gmac0(SGMII)
 		ethernet0 = &gmac1;
 		ethernet1 = &gmac0;
 		mmc0 = &sdmmc0;
@@ -162,7 +161,6 @@
 		vin-supply = <&dc_12v>;
 	};
 
-	// VPU相关电源补充
 	vpu_core: vpu-core {
 		compatible = "rockchip,rk3568-vpu", "rockchip,rk3399-vpu";
 		clocks = <&cru ACLK_VPU>, <&cru HCLK_VPU>, <&cru DCLK_VPU>;
@@ -183,8 +181,8 @@
 };
 
 &combphy2 {
-	rockchip,sgmii-mac-sel = <0>; /* Use gmac0 for sgmii */
-	phy-supply = <&vcc3v3_sys>; // 补充PHY供电
+	rockchip,sgmii-mac-sel = <0>; 
+	phy-supply = <&vcc3v3_sys>; 
 	status = "okay";
 };
 
@@ -204,10 +202,8 @@
 	cpu-supply = <&vdd_cpu>;
 };
 
-/* SGMII (Port 1, eth1) - 修复gmac0配置 */
 &gmac0 {
 	assigned-clocks = <&cru SCLK_GMAC0_RX_TX>, <&cru SCLK_GMAC0>;
-	// 修正时钟父节点：PLL_GMAC0是RK3568 GMAC0的标准时钟源
 	assigned-clock-parents = <&gmac0_xpcsclk>, <&cru PLL_GMAC0>;
 	assigned-clock-rates = <0>, <125000000>;
 
@@ -224,12 +220,11 @@
 	phys = <&combphy2 PHY_TYPE_SGMII>;
 
 	pinctrl-names = "default";
-	pinctrl-0 = <&gmac0_miim &gmac0_rst>; // 关联复位PIN
+	pinctrl-0 = <&gmac0_miim &gmac0_rst>; 
 
 	snps,reset-gpio = <&gpio3 RK_PD0 GPIO_ACTIVE_LOW>;
 	snps,reset-active-low;
 	snps,reset-delays-us = <0 20000 100000>;
-	// 补充PHY地址检测和自动协商
 	phy-auto-negotiation;
 	phy-supply = <&vcc3v3_sys>;
 
@@ -239,7 +234,6 @@
 /* RGMII (Port 0, eth0) */
 &gmac1 {
 	assigned-clocks = <&cru SCLK_GMAC1>, <&cru SCLK_GMAC1_RX_TX>;
-	// 修正时钟父节点：使用标准枚举值而非数字
 	assigned-clock-parents = <&cru PLL_GMAC1>, <&cru PLL_GMAC1>;
 	assigned-clock-rates = <0>, <125000000>;
 
@@ -266,22 +260,18 @@
 	status = "okay";
 };
 
-/* 完善GPU配置 */
 &gpu {
 	mali-supply = <&vdd_gpu>;
-	// 补充时钟和电源域配置
 	clocks = <&cru ACLK_GPU>, <&cru HCLK_GPU>, <&cru PCLK_GPU>;
 	clock-names = "aclk", "hclk", "pclk";
 	power-domains = <&power RK3568_PD_GPU>;
 	resets = <&cru SRST_GPU>;
 	reset-names = "gpu";
-	// 启用GPU性能管理
 	mali-supported-ratemasks = <0x7>;
 	mali-pm-levels = <1000000 800000 600000>;
 	status = "okay";
 };
 
-/* 添加VPU解码节点 */
 &rkvdec {
 	compatible = "rockchip,rk3568-vdec";
 	clocks = <&cru ACLK_VPU>, <&cru HCLK_VPU>, <&cru DCLK_VPU>;
@@ -292,7 +282,6 @@
 	status = "okay";
 };
 
-/* 添加VPU编码节点 */
 &rkvenc {
 	compatible = "rockchip,rk3568-venc";
 	clocks = <&cru ACLK_VPU>, <&cru HCLK_VPU>, <&cru DCLK_VPU>;
@@ -645,7 +634,6 @@
 		};
 	};
 
-	// 补充gmac0复位PIN配置
 	gmac0 {
 		gmac0_rst: gmac0-rst {
 			rockchip,pins = <3 RK_PD0 RK_FUNC_GPIO &pcfg_pull_none>;
@@ -801,7 +789,6 @@
 };
 
 &xpcs {
-	// 补充XPCS时钟和供电配置
 	clocks = <&gmac0_xpcsclk>;
 	clock-names = "xpcs";
 	phy-supply = <&vcc3v3_sys>;
@@ -811,3 +798,4 @@
 #include "rk3568-vngpu.dtsi"
 #include "rk3568-vngpu-rk809.dtsi"
 #include "rk3568-ramoops.dtsi"
+
